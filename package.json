@@ -5,14 +5,16 @@
   "author": "Yang",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js && node server/index.js",
+    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
     "build": "node build/build.js"
   },
   "dependencies": {
+    "koa": "^2.5.3",
+    "puppeteer": "^1.8.0",
+    "request": "^2.88.0",
     "vue": "^2.5.2",
-    "vue-router": "^3.0.1",
-    "koa": "^2.5.3"
+    "vue-router": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

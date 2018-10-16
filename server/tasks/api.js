@@ -3,26 +3,36 @@
  * @author yangkun
  */
 // http://api.douban.com/v2/movie/subject/1764796
-  const rp = require('request-promise-native');
+const rp = require('request-promise-native');
+const mongoose = require('mongoose')
+const Movie = mongoose.model('Movie')
+
 async function fetchMovie(item) {
   const url = `http://api.douban.com/v2/movie/subject/${item.doubanId}`;
   return res = await rp(url);
 }
 ;(async () => {
-    let movies = [
-      {
-        doubanId: 1292213,
-        title: '大话西游之大圣娶亲',
-        rate: 9.2,
-        poster: 'https://img3.doubanio.com/view/photo/l_ratio_poster/public/p2455050536.jpg'
-      },
-      {
-        doubanId: 1851857,
-        title: '蝙蝠侠：黑暗骑士',
-        rate: 9.1,
-        poster: 'https://img3.doubanio.com/view/photo/l_ratio_poster/public/p462657443.jpg'
+    let movies = await Movie.find({
+      $or: [
+        {summary: { $exists: false}},
+        {summary: null},
+        {title: ''},
+        {summary: ''},
+      ]
+    });
+
+    for(let i = 0; i < movies.length; i++) {
+      let movie = movies[i]
+      let movieData = await fetchMovie(movie)
+
+      if(movieData) {
+        let tags = movieData.tags || []
+        movies.tags = tags
+        movies.summary = movieData.summary || ''
+        movies.title = movieData.title || ''
       }
-    ];
+    }
+
     movies.map(async movie => {
       let movieData = await fetchMovie(movie);
       try {

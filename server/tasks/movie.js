@@ -1,5 +1,8 @@
 const cp = require('child_process');
 const {resolve} = require('path');
+const mongoose = require('mongoose')
+const Movie = mongoose.model('Movie')
+
 //子进程
 (async () => {
   const script = resolve(__dirname, '../crawler/trailer-list.js');
@@ -18,6 +21,16 @@ const {resolve} = require('path');
   });
   child.on('message', data => {
     let result = data.result;
+    result.forEach(async function(item) {
+      let movie = await Movie.findOne({
+        doubanId: item.doubanId
+      })
+      //如果没有id 就存储整体
+      if(!movie) {
+        movie = new Movie(item)
+        await movie.save()
+      }
+    })
     console.log(data)
     console.log('hahahhahah哈哈哈')
   });

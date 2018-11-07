@@ -15,25 +15,25 @@ exports.connect = () => {
     if(process.env.NODE_ENV !== 'production') {
       mongoose.set('debug',true)
     }
-    mongoose.connect(db,{useNewUrlParser:true})
+    mongoose.connect(db,{useNewUrlParser:true});
+    //当数据库断开后 重新连接
     mongoose.connection.on('disconnnected',() => {
-      maxConnectTimes++
+      maxConnectTimes++;
       if(maxConnectTimes < 5) {
         mongoose.connect(db,{useNewUrlParser:true})
       } else {
         throw new Error('数据库挂了吧，快去修下')
       }
-    })
-
+    });
+    //当数据库出错的时候
     mongoose.connection.on('error',(err) => {
       maxConnectTimes++
-
       if(maxConnectTimes < 5) {
         mongoose.connect(db,{useNewUrlParser:true})
       } else {
         throw new Error('数据库挂了吧，快去修下')
       }
-    })
+    });
     mongoose.connection.once('open', () => {
       // const Dog = mongoose.model('Dog',{name:String})
       // const doga = new Dog({name:'阿尔法'})
@@ -43,7 +43,7 @@ exports.connect = () => {
       //     console.log('wang')
       //   })
 
-      resolve()
+      resolve();
       console.log('MongoDB Connected successfully!')
     })
   })

@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 
 const categorySchema = new Schema({
@@ -9,7 +9,7 @@ const categorySchema = new Schema({
   },
   movies:[{
     type: ObjectId,
-    ref:'Movie'
+    ref: 'Movie'
   }],
   meta: {
     createdAt: {
@@ -30,5 +30,5 @@ categorySchema.pre('save', function(next) {
     this.meta.updateAt = Date.now()
   }
   next()
-})
+});
 mongoose.model('Category',categorySchema);

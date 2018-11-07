@@ -1,6 +1,6 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-const bcrypt = require('bcryptjs')
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const bcrypt = require('bcryptjs');
 const Mixed = Schema.Types.Mixed;//存储任意类型的数据
 
 const SALT_WORK_FACTOR = 10;
@@ -41,7 +41,7 @@ const userSchema = new Schema({
 //增加虚拟字段  区分是否被冻结
 userSchema.virtual('isLocked').get(function() {
   return !!(this.lockUntil && this.lockUntil > Date.now())
-})
+});
 
 
 //在保存之前
@@ -52,18 +52,19 @@ userSchema.pre('save', function(next)  {
     this.meta.updateAt = Date.now()
   }
   next()
-})
+});
 userSchema.pre('save', function(next)  {
-  if (!this.isModified('password')) return next()
-  //加密库
+  if (!this.isModified('password')) return next();
+  //加密库 SALT_WORK_FACTOR 盐值 越大加密性越好  但不要太大 会影响性能
   bcrypt.genSalt(SALT_WORK_FACTOR, (err, salt) => {
-    if (err) return next(err)
+    if (err) return next(err);
+    //通过hash加密
     bcrypt.hash(this.password, salt, (err, hash) => {
-      if (err) return next(err)
+      if (err) return next(err);
       this.password = hash;
       next()
     })
-  })
+  });
   if (this.isNew) {
     this.meta.createdAt = this.meta.updateAt = Date.now()
   } else {
@@ -82,6 +83,7 @@ userSchema.methods = {
       })
     })
   },
+  //每次密码输入错误
   incLoginAttepts: (user) => {
     return new Promise((resolve,reject) => {
       if(this.lockUntil && this.lockUntil < Date.now()) {
@@ -93,7 +95,7 @@ userSchema.methods = {
             lockUntil:1
           }
         }, (err) => {
-          if(!err) resolve(true)
+          if(!err) resolve(true);
           else reject(err)
         })
       } else {
@@ -101,7 +103,7 @@ userSchema.methods = {
           $inc: {
             loginAttempts:1
           }
-        }
+        };
         //满足条件 就锁住
         if(this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
           updates.$set = {
@@ -109,7 +111,7 @@ userSchema.methods = {
           }
         }
         this.update(updates, err => {
-          if(!err) resolve(true)
+          if(!err) resolve(true);
           else reject(err)
         })
       }
